@@ -2,12 +2,16 @@
 import os
 import discord
 from dotenv import load_dotenv
+import random
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-client = discord.Client(intents=discord.Intents.default())
+intents=discord.Intents.default()
+intents.members = True
+intents.message_content = True
+client = discord.Client(intents=intents)
 
 
 @client.event
@@ -22,5 +26,39 @@ async def on_ready():
 
     for members in guild.members:
       print(f'Guild Members:\n - {members}')    # Test to see list of users who are members of the guild
+
+
+# Welcoming new members
+@client.event
+async def on_member_join(member):
+    await member.send(f'Hi {member.name}, welcome to the server!')
+
+
+# Responds to messages
+@client.event
+async def on_message(message):
+    if message.author == client.user:    # client.user is the bot
+        return
+    # Client(Bot) can’t tell the difference between a bot user and a normal user account, your on_message() handler should protect against a potentially recursive case where the bot sends a message that it might, itself, handle.
+    
+    brooklyn_99_quotes = [
+        'I\'m the human form of the 💯 emoji.',
+        'Bingpot!',
+        (
+            'Cool. Cool cool cool cool cool cool cool, '
+            'no doubt no doubt no doubt no doubt.'
+        ),
+    ]
+    if message.content == '99!':
+        respone = random.choice(brooklyn_99_quotes)
+        await message.channel.send(respone)
+
+    if 'happy birthday' in message.content.lower():
+        await message.channel.send("Happy Birthday! 🎈🎉")
+
+
+
+
+
 
 client.run(DISCORD_TOKEN)
