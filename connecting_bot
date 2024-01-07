@@ -1,0 +1,73 @@
+# Convert bot.py to use a Bot instead of a Client
+# bot.py
+import os
+import discord
+from discord.ext import commands
+from dotenv import load_dotenv
+import random
+
+load_dotenv()
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+GUILD = os.getenv('DISCORD_GUILD')
+
+intents=discord.Intents.default()
+intents.members = True
+intents.message_content = True
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+@bot.event
+async def on_ready():
+    # guild = discord.utils.find(lambda g : g.name == GUILD, client.guilds) -> This can replace the rest of the guild for loop
+    for guild in bot.guilds:
+        if guild.name == GUILD:
+            break
+    print(f'{bot.user} has connected to Discord!')   # Test to see the bot's name
+    print(f'{bot.user} is connected to the following guild')    # Test to see name of the server
+    print(f'{guild.name}(id:{guild.id})')   # Test to see the ID of the server
+
+    for members in guild.members:
+      print(f'Guild Members:\n - {members}')    # Test to see list of users who are members of the guild
+
+
+# Welcoming new members
+@bot.event
+async def on_member_join(member):
+    await member.send(f'Hi {member.name}, welcome to the server!')
+
+
+# Responds to messages
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:    # client.user is the bot
+        return
+    # Client(Bot) can’t tell the difference between a bot user and a normal user account, your on_message() handler should protect against a potentially recursive case where the bot sends a message that it might, itself, handle.
+    brooklyn_99_quotes = [
+        'I\'m the human form of the 💯 emoji.',
+        'Bingpot!',
+        (
+            'Cool. Cool cool cool cool cool cool cool, '
+            'no doubt no doubt no doubt no doubt.'
+        ),
+    ]
+    if message.content == '99!':
+        respone = random.choice(brooklyn_99_quotes)
+        await message.channel.send(respone)
+
+    if 'happy birthday' in message.content.lower():
+        await message.channel.send("Happy Birthday! 🎈🎉")
+    
+    elif message.content == 'raise-exception':
+        raise discord.DiscordException
+    
+# Handling exceptions
+@bot.event
+async def on_error(event,*args, **kwargs):
+    with open('err.log','a') as fileObj:
+        if event == 'on_message':
+            fileObj.write(f'Unhandle message: {args[0]}\n')
+        else:
+            raise
+
+
+
+bot.run(DISCORD_TOKEN)
