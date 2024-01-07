@@ -41,20 +41,18 @@ async def on_message(message):
     if message.author == bot.user:    # client.user is the bot
         return
     # Client(Bot) can’t tell the difference between a bot user and a normal user account, your on_message() handler should protect against a potentially recursive case where the bot sends a message that it might, itself, handle.
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
+    nero_reaction = [
+        '真的嗎！！:sparkling_heart: ', 
+        '哼～肯定的啊',
+        '羅馬！！！！！:flag_it: ',
+        '嗯哼，余可謂天上天下，美麗至尊！:100: '
     ]
-    if message.content == '99!':
-        respone = random.choice(brooklyn_99_quotes)
+    if message.content == 'Nero cute!':
+        respone = random.choice(nero_reaction)
         await message.channel.send(respone)
 
     if 'happy birthday' in message.content.lower():
-        await message.channel.send("Happy Birthday! 🎈🎉")
+        await message.channel.send("Happy Birthday! 🎈:birthday: 🎉")
     
     elif message.content == 'raise-exception':
         raise discord.DiscordException
